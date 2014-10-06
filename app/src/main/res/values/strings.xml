@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Folk This</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_search_results_screen">SearchResultsScreen</string>
+    <string name="title_activity_tune_list_screen">TuneListScreen</string>
+    <string name="title_activity_tune_sheet_music">TuneSheetMusic</string>
+    <string name="title_activity_tune_version_screen">TuneVersionScreen</string>
+    <string name="title_activity_test">test</string>
+    <string name="title_activity_activity_tune_sheet_music">activity_tune_sheet_music</string>
+
+</resources>

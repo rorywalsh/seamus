@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.company.rorywalsh.folkthis.TuneSheetMusic" >
+    <item android:id="@+id/playTune"
+        android:title="Play Tune"
+        android:orderInCategory="100"
+        android:showAsAction="always" />
+    <item android:id="@+id/toggleView"
+        android:title="Toggle view"
+        android:orderInCategory="101"
+        android:showAsAction="never" />
+    <item android:id="@+id/saveTune"
+        android:title="Save Tune"
+        android:orderInCategory="102"
+        android:showAsAction="ifRoom" />
+    </menu>
