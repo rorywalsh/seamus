@@ -40,7 +40,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         addTunesToListView(names);
         fileLocation = extras.getString("location");
 
-        Log.d("=======================================", "onCreate TuneListScreen");
+        //Log.d("=======================================", "onCreate TuneListScreen");
 
 
     }
@@ -57,7 +57,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         super.onContextItemSelected(item);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        Log.d("=========", links.get(info.position));
+        //Log.d("=========", links.get(info.position));
         if(item.getTitle().equals("Remove from tune book")) {
             File file = new File(links.get(info.position));
             file.delete();

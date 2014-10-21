@@ -74,7 +74,7 @@ public class TuneSheetMusic extends Activity {
 
     public StringBuilder generateCsoundScore(ArrayList<abcNote> myABCNotes, float time){
         //generate Csound score from ABC notes and data
-        Log.d("FFFFFFFFFFFFF", String.valueOf(myABCNotes.size()));
+        //Log.d("FFFFFFFFFFFFF", String.valueOf(myABCNotes.size()));
         float dur=0.f;
         //set up ten loops of performance..
         float emphasis=1;
@@ -145,7 +145,7 @@ public class TuneSheetMusic extends Activity {
         "iplk\trandom\t0.5, 0.8 ;\t\"pos\"\t; pluck position\n" +
         "iamp\trandom\t0.5, 0.7\n" +
         "\n" +
-        "iFreq = pow(2, ((p4-69)/12))*400;\n" +
+        "iFreq = pow(2, ((p4-69)/12))*440;\n" +
         "\n" +
         "kmvt\tjspline\t\t0.15,0.2,1\t\t\n" +
         "asig\twgpluck2\tiplk, iamp, iFreq,   0.2+kmvt,          kdamp\n" +
@@ -191,10 +191,10 @@ public class TuneSheetMusic extends Activity {
         notes = new ArrayList<String>(Arrays.asList(noteData.split("[\r\n]")));
         try {
             myABCNotes = parseABCFile(notes);
-            Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
+            //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
         }
         catch (IOException e) {
-            Log.d("==========", "parse Notes exception");
+            //Log.d("==========", "parse Notes exception");
         }
 
         //set key sig for each note....
@@ -206,7 +206,7 @@ public class TuneSheetMusic extends Activity {
 
 
         csoundSco = generateCsoundScore(myABCNotes, 1.5f);
-        Log.d("============FULL SCORE========", csoundSco.toString());
+        //Log.d("============FULL SCORE========", csoundSco.toString());
 
 
 
@@ -232,7 +232,7 @@ public class TuneSheetMusic extends Activity {
         //TextView  title = (TextView) findViewById( R.id.tuneTitle);
         //title.setText(tuneTitle+" ("+tuneType+")");
 
-        Log.d("-_-_-_-_-", formatString(notes));
+        //Log.d("-_-_-_-_-", formatString(notes));
         htmlCode = "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
@@ -407,7 +407,7 @@ public class TuneSheetMusic extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        Log.d("====Menu ID:", String.valueOf(id));
+        //Log.d("====Menu ID:", String.valueOf(id));
         if(id == R.id.toggleView){
         if(position.equals("sheetMusic")) {
             webView.loadUrl("javascript:scrollToElement('" + "abcMusic" + "')");
@@ -422,10 +422,10 @@ public class TuneSheetMusic extends Activity {
         else if(id==90){
             try {
                 myABCNotes = parseABCFile(notes);
-                Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
+                //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
-                Log.d("==========", "parse Notes exception");
+                //Log.d("==========", "parse Notes exception");
             }
             csoundSco = generateCsoundScore(myABCNotes, 1);
         }
@@ -433,10 +433,10 @@ public class TuneSheetMusic extends Activity {
         else if(id==91){
             try {
                 myABCNotes = parseABCFile(notes);
-                Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
+                //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
-                Log.d("==========", "parse Notes exception");
+                //Log.d("==========", "parse Notes exception");
             }
             csoundSco = generateCsoundScore(myABCNotes, 1.5f);
         }
@@ -444,10 +444,10 @@ public class TuneSheetMusic extends Activity {
         else if(id==92){
             try {
                 myABCNotes = parseABCFile(notes);
-                Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
+                //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
-                Log.d("==========", "parse Notes exception");
+               // Log.d("==========", "parse Notes exception");
             }
             csoundSco = generateCsoundScore(myABCNotes, 2f);
         }
@@ -455,10 +455,10 @@ public class TuneSheetMusic extends Activity {
         else if(id==93){
             try {
                 myABCNotes = parseABCFile(notes);
-                Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
+                //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
-                Log.d("==========", "parse Notes exception");
+                //Log.d("==========", "parse Notes exception");
             }
             csoundSco = generateCsoundScore(myABCNotes, 3f);
         }
@@ -564,7 +564,7 @@ public class TuneSheetMusic extends Activity {
 
             case 'f':
                 if(key.matches("emin|d|e|g|a|b|edor|edorian|adorian|ador|eminor|bmin|amix|dmix")){
-                    Log.d("==========", "F#");
+                    //Log.d("==========", "F#");
                     midiNote = 66;
                 }
                 else
@@ -629,7 +629,7 @@ public class TuneSheetMusic extends Activity {
         }
 
         for(String note: abcText) {
-            Log.d("=======ABC TEXT=====", note);
+            //Log.d("=======ABC TEXT=====", note);
         }
         //grab each of the section endings
         for(int i=0;i<abcText.size();i++)
