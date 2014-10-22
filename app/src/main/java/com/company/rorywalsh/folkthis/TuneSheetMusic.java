@@ -145,7 +145,7 @@ public class TuneSheetMusic extends Activity {
         "iplk\trandom\t0.5, 0.8 ;\t\"pos\"\t; pluck position\n" +
         "iamp\trandom\t0.5, 0.7\n" +
         "\n" +
-        "iFreq = pow(2, ((p4-69)/12))*440;\n" +
+        "iFreq cpsmidinn p4; = pow(2, ((p4-69)/12))*440;\n" +
         "\n" +
         "kmvt\tjspline\t\t0.15,0.2,1\t\t\n" +
         "asig\twgpluck2\tiplk, iamp, iFreq,   0.2+kmvt,          kdamp\n" +
@@ -602,9 +602,8 @@ public class TuneSheetMusic extends Activity {
                 break;
 
         }
-        //think my algo in the csound code is not converting to correct frequency
-        //so I'm adding two here
-        return midiNote+accidental+octave+2;
+
+        return midiNote+accidental+octave;
     }
 
     /*parse ABC file */
