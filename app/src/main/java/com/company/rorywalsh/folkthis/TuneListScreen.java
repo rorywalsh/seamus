@@ -33,6 +33,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         setContentView(R.layout.activity_tune_list_screen);
         Bundle extras = getIntent().getExtras();
         listView = (ListView) findViewById( R.id.tuneListView);
+
         listView.setOnItemClickListener(this);
         registerForContextMenu(listView);
         names = extras.getStringArrayList("tuneNames");
