@@ -72,6 +72,7 @@ public class TuneVersionScreen  extends Activity implements AdapterView.OnItemCl
         if(id == R.id.action_settings) {
             return true;
         }
+        finish();
         return super.onOptionsItemSelected(item);
     }
 

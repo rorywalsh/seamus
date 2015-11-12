@@ -48,7 +48,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
         super.onCreate(savedInstanceState);
         searchURL="";
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.setTitle("Search for tunes");
+        this.setTitle("Seamus");
 
         //Log.d("=======================================", "onCreate HomeScreen");
         setContentView(R.layout.activity_home_screen);

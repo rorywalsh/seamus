@@ -1,11 +1,14 @@
 package com.company.rorywalsh.folkthis;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -21,9 +24,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import csnd6.AndroidCsound;
-import csnd6.Csound;
+
 import csnd6.CsoundPerformanceThread;
+import csnd6.AndroidCsound;
 
 class abcNote {
     ArrayList<Integer> jumpToBar = new ArrayList<Integer>();
@@ -54,7 +57,7 @@ public class TuneSheetMusic extends Activity {
     String htmlCode;
     String noteData;
     String tuneType;
-    String csoundOrc, csoundOrc2;
+    String csoundOrc;
     StringBuilder csoundSco;
     private ArrayList<abcNote> myABCNotes;
     private AndroidCsound csound;
@@ -98,14 +101,14 @@ public class TuneSheetMusic extends Activity {
         }
 
         StringBuilder score= new StringBuilder(1024);
-        score.append("r1\n");
+        score.append("r10\n");
         float clock=0f;
         float decay=1;
         for(int i=1;i<myABCNotes.size();i++){
             if(myABCNotes.get(i).amplitude==1)
                 clock=0f;
             //System.out.println("i1\t\t"+String.valueOf(dur)+"\t\t"+String.valueOf(myNotes.get(i).noteDur*time)+"\t\t"+getMidiNote(myNotes.get(i)));
-            String scoState="i1 "+String.valueOf(dur)+" "+String.valueOf(myABCNotes.get(i).noteDur*time)+" "+getMidiNote(myABCNotes.get(i))+" "+String.valueOf(decay)+" "+(clock%emphasis==0 ? 1 : .3f)+"\n";
+            String scoState="i1 "+String.valueOf(dur)+"\t\t\t\t"+String.valueOf(myABCNotes.get(i).noteDur*time)+"\t"+getMidiNote(myABCNotes.get(i))+" "+String.valueOf(decay)+" "+(clock%emphasis==0 ? 1 : .3f)+"\n";
             score.append(scoState);
             dur += myABCNotes.get(i).noteDur*time;
             clock +=myABCNotes.get(i).noteDur*time;
@@ -312,21 +315,6 @@ public class TuneSheetMusic extends Activity {
         }
     }
 
-    public void buttonOnClick(View view) {
-//        if(position.equals("sheetMusic")) {
-//            Button button = (Button) findViewById( R.id.toggleView);
-//            button.setText("Show notation");
-//            webView.loadUrl("javascript:scrollToElement('" + "abcMusic" + "')");
-//            position = "abcMusic";
-//        }
-//        else{
-//            position = "sheetMusic";
-//            Button button = (Button) findViewById( R.id.toggleView);
-//            button.setText("Show ABC");
-//            webView.loadUrl("javascript:scrollToElement('" + "sheetMusic" + "')");
-//        }
-    }
-
     public static String formatString(ArrayList<String> str) {
         StringBuilder builder = new StringBuilder();
         for (String value : str) {
@@ -345,36 +333,14 @@ public class TuneSheetMusic extends Activity {
         //return true;
         int TEMPO=0;
         SubMenu tempoMenu = menu.addSubMenu("Tempo");
-
         tempoMenu.add(TEMPO, 90, 0, "Fast");
         tempoMenu.add(TEMPO, 91, 1, "Medium");
         tempoMenu.add(TEMPO, 92, 2, "Slow");
         tempoMenu.add(TEMPO, 93, 2, "Baby Steps");
 
+        int PLAYBACK=0;
         return super.onCreateOptionsMenu(menu);
     }
-
-    public String writeFileToSDCard(String fileName, String contents){
-           File sdcard = Environment.getExternalStorageDirectory();
-           File dir = new File(sdcard.getAbsolutePath() + "/seamus_app/");
-           dir.mkdir();
-
-           File file = new File(dir, fileName);
-           try {
-               FileOutputStream os = new FileOutputStream(file);
-               try{
-                   os.write(contents.getBytes());
-                   os.close();
-                   return file.getCanonicalPath();
-               }catch(IOException e){
-                   e.printStackTrace();
-               }
-
-           } catch(FileNotFoundException fnfe) {
-               System.out.println(fnfe.getMessage());
-           }
-        return "CouldNotWriteFile";
-       }
 
         public void csoundPerformance(String str){
             if(str.equals("start")) {
@@ -408,7 +374,7 @@ public class TuneSheetMusic extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //Log.d("====Menu ID:", String.valueOf(id));
-        if(id == R.id.toggleView){
+        if(id == R.id.toggle_view){
         if(position.equals("sheetMusic")) {
             webView.loadUrl("javascript:scrollToElement('" + "abcMusic" + "')");
             position = "abcMusic";
@@ -462,7 +428,8 @@ public class TuneSheetMusic extends Activity {
             }
             csoundSco = generateCsoundScore(myABCNotes, 3f);
         }
-        else if (id == R.id.playTune) {
+        else if (id == R.id.play_tune)
+        {
             if(item.getTitle().equals("Play Tune")){
                 item.setTitle("Stop Tune");
                 csoundPerformance("start");
@@ -474,8 +441,16 @@ public class TuneSheetMusic extends Activity {
             // This call runs Csound to completion
 
         }
+        else if(id == R.id.share){
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBody = noteData+"\n\n"+csoundOrc+"\n\n"+csoundSco;
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        }
 
-        else if (id == R.id.saveTune) {
+        else if (id == R.id.save_tune) {
             File sdcard = Environment.getExternalStorageDirectory();
             File dir = new File(sdcard.getAbsolutePath() + "/seamus_app/");
             dir.mkdir();
@@ -500,38 +475,6 @@ public class TuneSheetMusic extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-
-    private class CsoundThread extends AsyncTask<String, Void, String>
-    {
-        String fullScore;
-        @Override
-        protected String doInBackground(String... score){
-            String response = "";
-            fullScore = score[0];
-            //Log.d("====FULL SCORE+++", score[0]);
-            try {
-                // Compile the Csound SCO String
-
-            }
-
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-            return response;
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        @Override
-        protected void onPostExecute(String response) {
-            csound.Stop();
-        }
     }
 
     private static int getMidiNote(abcNote note){
@@ -564,7 +507,7 @@ public class TuneSheetMusic extends Activity {
 
             case 'f':
                 if(key.matches("emin|d|e|g|a|b|edor|edorian|adorian|ador|eminor|bmin|amix|dmix")){
-                    //Log.d("==========", "F#");
+                    Log.d("==========", "F#");
                     midiNote = 66;
                 }
                 else
@@ -1001,4 +944,17 @@ public class TuneSheetMusic extends Activity {
         }
         return myNotes;
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // your code
+            finish();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
 }
