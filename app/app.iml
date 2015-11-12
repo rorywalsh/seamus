@@ -91,5 +91,6 @@
     <orderEntry type="library" exported="" name="armeabi" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.7.3" level="project" />
     <orderEntry type="library" exported="" name="csoundandroid" level="project" />
+    <orderEntry type="library" exported="" name="armeabiWorking" level="project" />
   </component>
 </module>
