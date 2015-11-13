@@ -129,13 +129,23 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
             File sdCard = Environment.getExternalStorageDirectory();
             // to this path add a new directory path
             File dir = new File(sdCard.getAbsolutePath() + "/seamus_app/");
-            File[] fileList = dir.listFiles();
-            ArrayList<String> fileNames = new ArrayList<String>();
-            for (int i = 0; i < fileList.length; i++) {
-                fileNames.add(fileList[i].getName().replace(".txt", ""));
-                tuneLinks.add(fileList[i].getAbsolutePath());
+            if(dir.exists()) {
+                File[] fileList = dir.listFiles();
+                ArrayList<String> fileNames = new ArrayList<String>();
+                for (int i = 0; i < fileList.length; i++) {
+                    fileNames.add(fileList[i].getName().replace(".txt", ""));
+                    tuneLinks.add(fileList[i].getAbsolutePath());
+                }
+                if (tuneLinks.size() > 0)
+                    addTunesToTuneListScreen(fileNames);
             }
-            addTunesToTuneListScreen(fileNames);
+            else{
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Info");
+                alertDialog.setMessage("Tune book is currently empty.");
+                //alertDialog.setIcon(R.drawable.logoconcertina);
+                alertDialog.show();
+            }
         }
     }
 
