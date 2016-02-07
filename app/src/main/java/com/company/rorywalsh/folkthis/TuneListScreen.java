@@ -44,6 +44,8 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         listView = (ListView) findViewById( R.id.tuneListView);
 
         listView.setOnItemClickListener(this);
+        //int CHOICE_MODE_MULTIPLE=2;
+        //listView.setChoiceMode(CHOICE_MODE_MULTIPLE);
         registerForContextMenu(listView);
         names = extras.getStringArrayList("tuneNames");
         Collections.reverse(names);

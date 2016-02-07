@@ -41,6 +41,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
     ArrayList<String> tuneLinks;
     ProgressDialog progress;
     String currentTuneType="";
+    int recursions = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -192,6 +193,12 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
     //add tunes to TuneListScreenActivty
     void addTunesToTuneListScreen(ArrayList<String> tuneNamesArray){
         //Log.d("=======================================", "addTunesToTuneListScreen HomeScreen");
+        if(tuneLinks.size()<1 && recursions<5)
+        {
+            searchForTunes("remote");
+            recursions++;
+            return;
+        }
         Intent i = new Intent(getApplicationContext(), TuneListScreen.class);
         i.putExtra("location", fileLocation);
         i.putStringArrayListExtra("tuneNames", tuneNamesArray);
