@@ -37,45 +37,47 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+
+
         super.onCreate(savedInstanceState);
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_tune_list_screen);
         Bundle extras = getIntent().getExtras();
         listView = (ListView) findViewById( R.id.tuneListView);
-
+        fileLocation = extras.getString("location");
         listView.setOnItemClickListener(this);
         //int CHOICE_MODE_MULTIPLE=2;
         //listView.setChoiceMode(CHOICE_MODE_MULTIPLE);
         registerForContextMenu(listView);
         names = extras.getStringArrayList("tuneNames");
-        Collections.reverse(names);
-
         links = extras.getStringArrayList("tuneLinks");
-        Collections.reverse(links);
 
+        Collections.reverse(names);
+        Collections.reverse(links);
         linksByDate = new ArrayList<String>();
         linksByDate.addAll(links);
 
-        SharedPreferences settings = getSharedPreferences("SeamusPrefs", 0);
-        String sortType = settings.getString("sort_by", "date");
-        if(sortType.contains("name"))
-        {
-            Log.d("======================", sortType);
-            Collections.sort(names);
-            Collections.sort(links);
+        if(!fileLocation.equals("remote")) {
+
+
+
+            SharedPreferences settings = getSharedPreferences("SeamusPrefs", 0);
+            String sortType = settings.getString("sort_by", "date");
+            if (sortType.contains("name")) {
+                Log.d("======================", sortType);
+                Collections.sort(names);
+                Collections.sort(links);
+                Log.d("====", "Size of list of links=" + names.size());
+            } else if (sortType.contains("type")) {
+                sortByType();
+            }
+
+            //Log.d("=======================================", "onCreate TuneListScreen");
         }
 
-        else if(sortType.contains("type"))
-        {
-            sortByType();
-        }
+
 
         addTunesToListView(names);
-        fileLocation = extras.getString("location");
-
-        //Log.d("=======================================", "onCreate TuneListScreen");
-
-
     }
 
     @Override
@@ -209,6 +211,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
 
     void sortByType()
     {
+        Log.d("====", "Size of list of links=" + names.size());
         ArrayList<String> jigs, reels, hornpipes, slipjigs, slides, waltzes, dances, other;
         jigs = new ArrayList<String>();
         reels = new ArrayList<String>();
@@ -221,6 +224,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
 
         for(int i=0;i<links.size();i++)
         {
+            Log.d("====", "Link=" + links.get(i));
             if (links.get(i).contains("Slip jig"))
                 slipjigs.add(links.get(i));
             else if (links.get(i).contains("Jig"))
@@ -246,6 +250,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         Collections.sort(reels);
         Collections.sort(waltzes);
         Collections.sort(dances);
+        Collections.sort(other);
 
         links.clear();
         links.addAll(jigs);
@@ -255,10 +260,11 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         links.addAll(reels);
         links.addAll(waltzes);
         links.addAll(dances);
+        links.addAll(other);
 
         updateNamesFromLinks();
         addTunesToListView(names);
-
+        Log.d("====", "Size of list of links=" + names.size());
     }
 
     void updateNamesFromLinks()
