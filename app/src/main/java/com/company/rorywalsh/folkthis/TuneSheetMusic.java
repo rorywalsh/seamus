@@ -61,9 +61,9 @@ public class TuneSheetMusic extends Activity {
     StringBuilder csoundSco;
     private ArrayList<abcNote> myABCNotes;
     private AndroidCsound csound;
+    private CsoundPerformanceThread perfThread;
     private ArrayList<String> notes;
     float tempo;
-    private CsoundPerformanceThread perfThread;
 
 
     @Override

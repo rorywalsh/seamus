@@ -40,8 +40,10 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
     String searchURL;
     ArrayList<String> tuneTypes;
     ArrayList<String> tuneLinks;
+    ArrayList<String> tuneNames;
     ProgressDialog progress;
     String currentTuneType="";
+    int recursions = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,6 +66,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
 
         tuneTypes = new ArrayList<String>();
         tuneLinks = new ArrayList<String>();
+        tuneNames = new ArrayList<String>();
         tuneLinks.clear();
         tuneTypes.add("Type of Tune");
         tuneTypes.add("jig");
@@ -121,7 +124,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
 
     public void searchForTunes(String location){
         fileLocation = location;
-        tuneLinks.clear();
+
         if(location.equals("remote")) {
             MyHtmlParser parser = new MyHtmlParser();
             EditText textBox = (EditText) findViewById(R.id.searchText);
@@ -155,6 +158,8 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
     public void buttonOnClick(View view) {
         switch (view.getId()) {
             case R.id.searchButton: {
+                tuneLinks.clear();
+                tuneNames.clear();
                 searchForTunes("remote");
                 break;
             }
@@ -195,21 +200,25 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
     //add tunes to TuneListScreenActivty
     void addTunesToTuneListScreen(ArrayList<String> tuneNamesArray){
         //Log.d("=======================================", "addTunesToTuneListScreen HomeScreen");
+        if(tuneLinks.size()<1 && recursions<5)
+        {
+            searchForTunes("remote");
+            recursions++;
+            return;
+        }
         Intent i = new Intent(getApplicationContext(), TuneListScreen.class);
         i.putExtra("location", fileLocation);
-        i.putStringArrayListExtra("tuneNames", tuneNamesArray);
+        i.putStringArrayListExtra("tuneNames", tuneNames);
         i.putStringArrayListExtra("tuneLinks", tuneLinks);
         startActivity(i);
     }
 
     private class MyHtmlParser extends AsyncTask<String, Void, String>
     {
-        ArrayList<String> tuneNames;
+
         @Override
         protected String doInBackground(String... urls){
             String response = "";
-            tuneLinks.clear();
-            tuneNames = new ArrayList<String>();
             try {
                     int pageCount = 1;
                     String urlAddress = urls[1];
@@ -225,8 +234,10 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
 
                             for (Element link : links) {
                                 if (link.attr("abs:href").contains("/tunes/") &&  !link.attr("abs:href").contains("/tunes/popular") && !link.attr("abs:href").contains("search")) {
+                                    Log.d("+++++", link.toString());
                                     tuneLinks.add(link.attr("abs:href"));
                                     tuneNames.add(link.text().trim() + "\n");
+                                    //Log.d("+++++", tuneNames.get(tuneNames.size() - 1));
                                 }
                             }
 
