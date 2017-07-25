@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ArrayAdapter;
@@ -49,6 +50,8 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
         searchURL="";
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setTitle("Seamus");
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //Log.d("=======================================", "onCreate HomeScreen");
         setContentView(R.layout.activity_home_screen);
