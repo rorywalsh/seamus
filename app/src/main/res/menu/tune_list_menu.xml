@@ -16,6 +16,11 @@
             <item android:id="@+id/date"
                 android:title="Date added" />
         </menu>
-        </item>
+    </item>
+    <item android:id="@+id/share"
+        android:title="Share"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom">
+    </item>
 
 </menu>

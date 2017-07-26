@@ -4,7 +4,9 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -15,13 +17,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 public class TuneListScreen extends Activity implements AdapterView.OnItemClickListener {
@@ -204,9 +212,70 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
             editor.putString("sort_by", "type");
             editor.apply();
         }
+        else if(id == R.id.share)
+        {
+            File sdCard = Environment.getExternalStorageDirectory();
+            File tunebookDir = new File(sdCard.getAbsolutePath() + "/seamus_app/");
+            String tmpZipFile = sdCard.getAbsolutePath() + "/SeamusTunes.zip";
+            File file = new File(tmpZipFile);
+            zipFiles(getAllFilesInTunebook(tunebookDir), tmpZipFile);    //call the zip function
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            sharingIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            sharingIntent.setType("application/zip");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        }
         else
             finish();
         return super.onOptionsItemSelected(item);
+    }
+
+    private List<File> getAllFilesInTunebook(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<File>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.addAll(getAllFilesInTunebook(file));
+            } else {
+                if(file.getName().endsWith(".txt")){
+                    inFiles.add(file);
+                }
+            }
+        }
+        return inFiles;
+    }
+
+    public void zipFiles(List<File> files, String zipFile) {
+        List<File> _files = files;
+        String _zipFile = zipFile;
+
+        try {
+            BufferedInputStream origin = null;
+            FileOutputStream dest = new FileOutputStream(_zipFile);
+
+            ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+
+            byte data[] = new byte[1024];
+
+            for (int i = 0; i < _files.size(); i++) {
+                Log.d("add:", _files.get(i).getAbsolutePath());
+                Log.v("Compress", "Adding: " + _files.get(i).getAbsolutePath());
+                FileInputStream fi = new FileInputStream(_files.get(i).getAbsolutePath());
+                origin = new BufferedInputStream(fi, 1024);
+                ZipEntry entry = new ZipEntry(_files.get(i).getAbsolutePath().substring(_files.get(i).getAbsolutePath().lastIndexOf("/") + 1));
+                out.putNextEntry(entry);
+                int count;
+                while ((count = origin.read(data, 0, 1024)) != -1) {
+                    out.write(data, 0, count);
+                }
+                origin.close();
+            }
+
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     void sortByType()
