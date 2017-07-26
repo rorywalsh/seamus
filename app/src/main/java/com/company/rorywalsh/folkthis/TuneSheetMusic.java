@@ -8,11 +8,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -24,6 +26,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import csnd6.CsoundPerformanceThread;
 import csnd6.AndroidCsound;
@@ -55,14 +59,15 @@ public class TuneSheetMusic extends Activity {
     WebView webView;
     String position;
     String htmlCode;
-    String noteData;
+    String abcNoteData;
     String tuneType;
     String csoundOrc;
     StringBuilder csoundSco;
+    Map chordsForKeys = new HashMap();
     private ArrayList<abcNote> myABCNotes;
     private AndroidCsound csound;
     private CsoundPerformanceThread perfThread;
-    private ArrayList<String> notes;
+    private ArrayList<String> abcText;
     float tempo;
 
 
@@ -133,10 +138,20 @@ public class TuneSheetMusic extends Activity {
         System.loadLibrary ("sndfile");
         System.loadLibrary ("csoundandroid");
 
-
+        chordsForKeys.put("D maj", "D - Em - F#m - G - A - Bm - C#m");
+        chordsForKeys.put("G maj", "G - Am - Bm - C - D - Em - F#m");
+        chordsForKeys.put("A maj", "A - Bm - C#m - D - E - F#m - G#m");
+        chordsForKeys.put("C maj", "C - Dm - Em - F - G - Am - Bm");
+        chordsForKeys.put("D mix", "D - Em - F# - G - Am - Bm - C");
+        chordsForKeys.put("A dor", "Am - Bm - C - D - Em - D/F# - G");
+        chordsForKeys.put("A min", "Am - Bm - C - D - Em - D/F# - G");
+        chordsForKeys.put("E dor", "Em - F#m - G - A - Bm - A/C# - D");
+        chordsForKeys.put("E min", "Em - F#m - G - A - Bm - A/C# - D");
+        chordsForKeys.put("A mix", "A - Bm - A/C# - D - Em - F#m - G");
 
         //========== CSOUND AND ABC PARSING STUFF=====================
         ArrayList<abcNote> myABCNotes = new ArrayList<abcNote>();
+
         csoundOrc="sr = 44100\n" +
         "ksmps = 64\n" +
         "nchnls=2\n" +
@@ -160,8 +175,9 @@ public class TuneSheetMusic extends Activity {
         "endin";
 
         setContentView(R.layout.activity_tune_sheet_music);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Bundle extras = getIntent().getExtras();
-        noteData = extras.getString("notes");
+        abcNoteData = extras.getString("notes");
 
         webView= (WebView) findViewById(R.id.webView);
         webView.setWebChromeClient(new WebChromeClient());
@@ -191,16 +207,16 @@ public class TuneSheetMusic extends Activity {
             }
         });
 
-        notes = new ArrayList<String>(Arrays.asList(noteData.split("[\r\n]")));
+        abcText = new ArrayList<String>(Arrays.asList(abcNoteData.split("[\r\n]")));
         try {
-            myABCNotes = parseABCFile(notes);
+            myABCNotes = parseABCFile(abcText);
             //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
         }
         catch (IOException e) {
             //Log.d("==========", "parse Notes exception");
         }
 
-        //set key sig for each note....
+        //apply key sig to each note....
         for(int i=1;i<myABCNotes.size();i++){
             myABCNotes.get(i).keySignature = myABCNotes.get(0).keySignature;
             myABCNotes.get(i).defaultNoteLength = myABCNotes.get(0).defaultNoteLength;
@@ -214,28 +230,46 @@ public class TuneSheetMusic extends Activity {
 
 
 
-        for(int i=0;i<notes.size();i++){
-            if(notes.get(i).contains("T:")) {
-                tuneTitle = notes.get(i).substring(notes.get(i).indexOf("T:") + 2).trim();
+        for(int i=0;i<abcText.size();i++){
+            if(abcText.get(i).contains("T:")) {
+                tuneTitle = abcText.get(i).substring(abcText.get(i).indexOf("T:") + 2).trim();
 //                notes.set(i, "T:     ");
             }
-      if(notes.get(i).contains("R:")){
-                String tune = notes.get(i).substring(notes.get(i).indexOf("R:") + 2).trim();
+      if(abcText.get(i).contains("R:")){
+                String tune = abcText.get(i).substring(abcText.get(i).indexOf("R:") + 2).trim();
                 tuneType = tune.substring(0,1).toUpperCase() + tune.substring(1);
                 //notes.set(i, "R:     ");
             }
         }
 
         //remove any bogus lines
-        for(int i=notes.size()-1;i>=0;i--)
-            if(notes.get(i).startsWith("\n")){
-                notes.remove(notes.get(i));
+        for(int i=abcText.size()-1;i>=0;i--)
+            if(abcText.get(i).startsWith("\n")){
+                abcText.remove(abcText.get(i));
             }
+
+        //modify notes so that it includes chords?
+//        for(int i=abcText.size()-1;i>=0;i--)
+//        {
+//            if (Character.isLetter(abcText.get(i).charAt(0)) && abcText.get(i).charAt(1) == ':')
+//            {
+//
+//            }
+//            else
+//                Log.d("-_-_-_-_-", abcText.get(i).toString());
+//        }
+        //Log.d("-_-_-_-_-", formatString(notes));
 
         //TextView  title = (TextView) findViewById( R.id.tuneTitle);
         //title.setText(tuneTitle+" ("+tuneType+")");
 
         //Log.d("-_-_-_-_-", formatString(notes));
+        String key = myABCNotes.get(0).keySignature.substring(0, 1).toUpperCase()+ " " + myABCNotes.get(0).keySignature.substring(1);
+        if(key.length()<3)
+            key = key + "maj";
+
+        String chords = getChordsForKey(key);
+
         htmlCode = "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
@@ -269,9 +303,13 @@ public class TuneSheetMusic extends Activity {
                 "<body>\n" +
                 "<a id=\"sheetMusic\"><br>\n" +
                 "<div align=\"center\" id=\"paper0\"></div>\n" +
-                "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
-                "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
-                "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
+                "<div align=\"center\" id=\"paper1\" style=\"width:800px; height:210px\">" +
+                "<br><font size=\"5\">This tune is listed as being in <font size=\"6\"><b>"+ key +
+                "</b><font size=\"5\">.<br>Accompaniment can be made up from the following chords<br>"+
+                "<i>(Note: Not all chords in the list will work for all tunes, and some chords may be missing!)<i>:"+
+                "<br><b><font size=\"6\">"+chords+
+                "</font></div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
+                "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></font><br>\n" +
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
@@ -279,7 +317,7 @@ public class TuneSheetMusic extends Activity {
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
                 "<a id=\"abcMusic\"><br>\n" +
                 "<textarea style=\"font-size: 18pt\" align=\"center\" name=\"abc\" id=\"abc\" cols=\"80\" rows=\"15\">" +
-                formatString(notes) +"\n"+
+                formatString(abcText) +"\n"+
                 "</textarea>\n" +
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
                 "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>\n" +
@@ -292,7 +330,7 @@ public class TuneSheetMusic extends Activity {
                 "</body>\n" +
                 "<script type=\"text/javascript\">\n" +
                 "\twindow.onload = function() {\n" +
-                "\t\tabc_editor = new ABCJS.Editor(\"abc\", { scale: 0.4, paper_id: \"paper0\", warnings_id:\"warnings\" });\n" +
+                "\t\tabc_editor = new ABCJS.Editor(\"abc\", { scale: 0.8, paper_id: \"paper0\", warnings_id:\"warnings\" });\n" +
                 "\t}\n" +
                 "function scrollToElement(id) {\n" +
                 "    var elem = document.getElementById(id);\n" +
@@ -324,6 +362,16 @@ public class TuneSheetMusic extends Activity {
             //builder.append(value);
         }
         return builder.toString();
+    }
+
+    public String getChordsForKey(String key)
+    {
+        if(chordsForKeys.containsKey(key)) {
+            Object o = chordsForKeys.get(key);
+            return o.toString();
+        }
+
+        return "No chords found for that key..";
     }
 
     @Override
@@ -387,7 +435,7 @@ public class TuneSheetMusic extends Activity {
         //fast
         else if(id==90){
             try {
-                myABCNotes = parseABCFile(notes);
+                myABCNotes = parseABCFile(abcText);
                 //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
@@ -398,7 +446,7 @@ public class TuneSheetMusic extends Activity {
         //medium
         else if(id==91){
             try {
-                myABCNotes = parseABCFile(notes);
+                myABCNotes = parseABCFile(abcText);
                 //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
@@ -409,7 +457,7 @@ public class TuneSheetMusic extends Activity {
         //slow
         else if(id==92){
             try {
-                myABCNotes = parseABCFile(notes);
+                myABCNotes = parseABCFile(abcText);
                 //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
@@ -420,7 +468,7 @@ public class TuneSheetMusic extends Activity {
         //very slow
         else if(id==93){
             try {
-                myABCNotes = parseABCFile(notes);
+                myABCNotes = parseABCFile(abcText);
                 //Log.d("=========KEY:::", myABCNotes.get(0).keySignature);
             }
             catch (IOException e) {
@@ -444,7 +492,7 @@ public class TuneSheetMusic extends Activity {
         else if(id == R.id.share){
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("text/plain");
-            String shareBody = noteData+"\n\n"+csoundOrc+"\n\n"+csoundSco;
+            String shareBody = abcNoteData+"\n\n"+csoundOrc+"\n\n"+csoundSco;
             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
             startActivity(Intent.createChooser(sharingIntent, "Share via"));
@@ -461,7 +509,7 @@ public class TuneSheetMusic extends Activity {
             try {
                 FileOutputStream os = new FileOutputStream(file);
                 try{
-                    os.write(noteData.getBytes());
+                    os.write(abcNoteData.getBytes());
                     os.close();
                 }catch(IOException e){
                     e.printStackTrace();

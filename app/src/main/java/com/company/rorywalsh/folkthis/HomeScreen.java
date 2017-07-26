@@ -53,7 +53,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
         //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setTitle("Seamus");
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 
         //Log.d("=======================================", "onCreate HomeScreen");
         setContentView(R.layout.activity_home_screen);
