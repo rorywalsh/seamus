@@ -208,7 +208,7 @@ public class HomeScreen extends Activity implements OnItemClickListener, Adapter
         }
         Intent i = new Intent(getApplicationContext(), TuneListScreen.class);
         i.putExtra("location", fileLocation);
-        i.putStringArrayListExtra("tuneNames", tuneNames);
+        i.putStringArrayListExtra("tuneNames", tuneNamesArray);
         i.putStringArrayListExtra("tuneLinks", tuneLinks);
         startActivity(i);
     }

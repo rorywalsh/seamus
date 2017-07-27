@@ -27,9 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -59,17 +57,8 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
         //int CHOICE_MODE_MULTIPLE=2;
         //listView.setChoiceMode(CHOICE_MODE_MULTIPLE);
         registerForContextMenu(listView);
-        //names = extras.getStringArrayList("tuneNames");
-        //names = (ArrayList<String>)getIntent().getSerializableExtra("tuneNames");
-        // creating a hashset using the list and remove duplicates...
-
-        names = new ArrayList<String>();
+        names = extras.getStringArrayList("tuneNames");
         links = extras.getStringArrayList("tuneLinks");
-
-        updateNamesFromLinks();
-        Set<String> listOfNames = new HashSet<String>(names);
-        names.clear();
-        names.addAll(listOfNames);
 
         Collections.reverse(names);
         Collections.reverse(links);
@@ -291,6 +280,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
 
     void sortByType()
     {
+        Log.d("====", "Size of list of links=" + names.size());
         ArrayList<String> jigs, reels, hornpipes, slipjigs, slides, waltzes, dances, other;
         jigs = new ArrayList<String>();
         reels = new ArrayList<String>();
@@ -343,6 +333,7 @@ public class TuneListScreen extends Activity implements AdapterView.OnItemClickL
 
         updateNamesFromLinks();
         addTunesToListView(names);
+        Log.d("====", "Size of list of links=" + names.size());
     }
 
     void updateNamesFromLinks()
