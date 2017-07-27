@@ -303,7 +303,7 @@ public class TuneSheetMusic extends Activity {
                 "<body>\n" +
                 "<a id=\"sheetMusic\"><br>\n" +
                 "<div align=\"center\" id=\"paper0\"></div>\n" +
-                "<div align=\"center\" id=\"paper1\" style=\"width:800px; height:210px\">" +
+                "<div align=\"center\" id=\"paper1\" style=\"width:800px; height:220px\">" +
                 "<br><font size=\"5\">This tune is listed as being in <font size=\"6\"><b>"+ key +
                 "</b><font size=\"5\">.<br>Accompaniment can be made up from the following chords<br>"+
                 "<i>(Note: Not all chords in the list will work for all tunes, and some chords may be missing!)<i>:"+
